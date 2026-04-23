@@ -239,7 +239,7 @@ export default function DashboardPage() {
                                         <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `Rp ${val/1000000}M`} /> 
                                         <Tooltip 
                                             contentStyle={{ backgroundColor: '#151521', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}
-                                            formatter={(value: number) => formatRupiah(value)}
+                                            formatter={(value: any) => formatRupiah(Number(value))}
                                             labelStyle={{ color: '#9ca3af', marginBottom: '8px', fontWeight: 'bold' }}
                                         />
                                         <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
@@ -335,7 +335,7 @@ export default function DashboardPage() {
                                             <Cell key={`cell-${index}`} fill={`url(#in-${WARNA_GRADASI[index % WARNA_GRADASI.length].id})`} className="hover:opacity-80 transition-opacity outline-none" />
                                         ))}
                                     </Pie>
-                                    <Tooltip formatter={(value: number) => formatRupiah(value)} contentStyle={{ backgroundColor: '#151521', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} itemStyle={{ fontWeight: 'bold' }} />
+                                    <Tooltip formatter={(value: any) => formatRupiah(Number(value))} contentStyle={{ backgroundColor: '#151521', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} itemStyle={{ fontWeight: 'bold' }} />
                                 </PieChart>
                             </ResponsiveContainer>
                         )}
@@ -379,7 +379,7 @@ export default function DashboardPage() {
                                             <Cell key={`cell-${index}`} fill={`url(#out-${WARNA_GRADASI[index % WARNA_GRADASI.length].id})`} className="hover:opacity-80 transition-opacity outline-none" />
                                         ))}
                                     </Pie>
-                                    <Tooltip formatter={(value: number) => formatRupiah(value)} contentStyle={{ backgroundColor: '#151521', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} itemStyle={{ fontWeight: 'bold' }} />
+                                    <Tooltip formatter={(value: any) => formatRupiah(Number(value))} contentStyle={{ backgroundColor: '#151521', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} itemStyle={{ fontWeight: 'bold' }} />
                                 </PieChart>
                             </ResponsiveContainer>
                         )}
