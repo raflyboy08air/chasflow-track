@@ -167,7 +167,7 @@ export default function HutangPage() {
                     
                     <div className="absolute left-0 w-full text-center pointer-events-none">
                         <h1 className="text-2xl font-extrabold tracking-tight">
-                            Semua Catatan <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Hutang</span>
+                            Catatan <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Hutang</span>
                         </h1>
                     </div>
                 </header>
