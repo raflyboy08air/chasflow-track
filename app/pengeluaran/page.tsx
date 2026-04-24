@@ -343,7 +343,7 @@ export default function PengeluaranPage() {
                                     <option value="Aset" className="bg-[#151521]">Aset</option>
                                     <option value="Jajan" className="bg-[#151521]">Jajan</option>
                                     <option value="Hobi" className="bg-[#151521]">Hobi</option>
-                                    <option value="Trasport" className="bg-[#151521]">Trasport</option>
+                                    <option value="Transport" className="bg-[#151521]">Transport</option>
                                     <option value="Rumah" className="bg-[#151521]">Rumah</option>
                                     <option value="Vape" className="bg-[#151521]">Vape</option>
                                     <option value="maintenance" className="bg-[#151521]">Maintenance</option>
