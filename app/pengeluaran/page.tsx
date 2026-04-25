@@ -18,7 +18,7 @@ export default function PengeluaranPage() {
 
     // State Form
     const [tanggal, setTanggal] = useState('');
-    const [kategori, setKategori] = useState('Jajan');
+    const [kategori, setKategori] = useState('Jajan'); // Default aman
     const [jumlah, setJumlah] = useState('');
     const [keterangan, setKeterangan] = useState('');
     
@@ -53,7 +53,6 @@ export default function PengeluaranPage() {
     const fetchPengeluaran = async () => {
         setIsLoading(true);
         
-        // Kalkulasi hari terakhir di bulan tersebut agar tidak error di database
         const tahunNum = parseInt(filterTahun);
         const bulanNum = parseInt(filterBulan);
         const hariTerakhir = new Date(tahunNum, bulanNum, 0).getDate();
@@ -90,12 +89,11 @@ export default function PengeluaranPage() {
             tanggal: tanggal,
             jumlah: Number(jumlah),
             keterangan: keterangan,
-            kategori: kategori,
+            kategori: kategori, // Mengirim data paten dari dropdown
             sumber_input: 'manual'
         };
 
         if (isEditing && editId) {
-            // MODE EDIT
             const { error } = await supabase
                 .from('pengeluaran')
                 .update(payload)
@@ -108,7 +106,6 @@ export default function PengeluaranPage() {
                 resetForm();
             }
         } else {
-            // MODE TAMBAH BARU
             const { error } = await supabase
                 .from('pengeluaran')
                 .insert([payload]);
@@ -157,7 +154,7 @@ export default function PengeluaranPage() {
         setTanggal('');
         setJumlah('');
         setKeterangan('');
-        setKategori('Jajan');
+        setKategori('Jajan'); // Kembalikan ke default aman
         setIsEditing(false);
         setEditId(null);
     };
@@ -173,7 +170,6 @@ export default function PengeluaranPage() {
     return (
         <div className="relative min-h-screen bg-[#0B0B0F] text-white p-4 sm:p-6 font-sans overflow-x-hidden">
             
-            {/* Background Glow Effects (Red/Rose Theme) */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-[-10%] left-[-5%] w-[400px] h-[400px] bg-rose-600/10 rounded-full blur-[100px]"></div>
                 <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[120px]"></div>
@@ -181,10 +177,8 @@ export default function PengeluaranPage() {
 
             <div className="relative z-10 max-w-7xl mx-auto space-y-6">
                 
-                {/* HEADER BERPUSAT DENGAN TOMBOL KEMBALI */}
                 <header className="relative flex items-center justify-between bg-[#151521]/70 backdrop-blur-xl p-4 sm:p-5 rounded-[2rem] shadow-xl border border-white/5">
                     
-                    {/* Tombol Kembali (Kiri) */}
                     <button 
                         onClick={() => router.push('/dashboard')}
                         className="relative overflow-hidden group px-6 py-2.5 text-sm font-semibold text-gray-300 bg-[#1c1c2a] border border-white/10 rounded-xl transition-all duration-300 hover:text-white hover:border-white/30 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:-translate-y-1 z-20"
@@ -195,30 +189,25 @@ export default function PengeluaranPage() {
                         </span>
                     </button>
                     
-                    {/* Judul (Tengah Mutlak) */}
                     <div className="absolute left-0 w-full text-center pointer-events-none">
                         <h1 className="text-2xl font-extrabold tracking-tight">
                             Manajemen <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-red-500">Pengeluaran</span>
                         </h1>
                     </div>
 
-                    {/* Spacer Kanan (Agar flex balance) */}
                     <div className="w-[110px] invisible hidden sm:block"></div>
                 </header>
 
                 <div className="flex flex-col lg:flex-row gap-6">
                     
-                    {/* BAGIAN KIRI: Tabel Data dengan Filter */}
                     <div className="flex-1 bg-[#151521]/70 backdrop-blur-xl rounded-[2rem] border border-white/5 shadow-xl flex flex-col min-h-[500px]">
                         
-                        {/* Header Tabel & Filter */}
                         <div className="p-6 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
                             <div>
                                 <h3 className="text-lg font-bold text-white">Riwayat Pengeluaran</h3>
                                 <p className="text-sm text-gray-400">Data keluar berdasarkan bulan</p>
                             </div>
 
-                            {/* Menu Filter */}
                             <div className="flex gap-3">
                                 <select 
                                     value={filterBulan}
@@ -242,7 +231,6 @@ export default function PengeluaranPage() {
                             </div>
                         </div>
 
-                        {/* Area Tabel */}
                         <div className="overflow-x-auto flex-1 p-2">
                             <table className="w-full text-left border-collapse">
                                 <thead>
@@ -304,7 +292,6 @@ export default function PengeluaranPage() {
                         </div>
                     </div>
 
-                    {/* BAGIAN KANAN: Form Input Kaca (Glassmorphism) */}
                     <div className="w-full lg:w-[350px] bg-[#151521]/70 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border border-white/5 shadow-xl h-fit sticky top-6">
                         
                         <div className="mb-6 border-b border-white/5 pb-4 flex justify-between items-end">
@@ -340,15 +327,15 @@ export default function PengeluaranPage() {
                                     onChange={(e) => setKategori(e.target.value)}
                                     className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-white focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500/50 cursor-pointer transition-all appearance-none"
                                 >
-                                    <option value="Aset" className="bg-[#151521]">Aset</option>
-                                    <option value="Jajan" className="bg-[#151521]">Jajan</option>
                                     <option value="Hobi" className="bg-[#151521]">Hobi</option>
                                     <option value="Transport" className="bg-[#151521]">Transport</option>
+                                    <option value="Jajan" className="bg-[#151521]">Jajan</option>
+                                    <option value="Aset" className="bg-[#151521]">Aset</option>
+                                    <option value="Reparasi" className="bg-[#151521]">Reparasi</option>
+                                    <option value="Maintenance" className="bg-[#151521]">Maintenance</option>
                                     <option value="Rumah" className="bg-[#151521]">Rumah</option>
                                     <option value="Vape" className="bg-[#151521]">Vape</option>
-                                    <option value="maintenance" className="bg-[#151521]">Maintenance</option>
-                                    <option value="Reparasi" className="bg-[#151521]">Reparasi</option>
-                                    <option value="Lain lain" className="bg-[#151521]">Lain lain</option>
+                                    <option value="Lain-Lain" className="bg-[#151521]">Lain-Lain</option>
                                 </select>
                             </div>
 

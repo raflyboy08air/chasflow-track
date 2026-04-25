@@ -15,6 +15,31 @@ export default function BulananPage() {
     const [dataRekap, setDataRekap] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // FUNGSI NORMALISASI KATEGORI (Sama seperti di Dashboard)
+    const normalisasiPemasukan = (kategoriLama: string) => {
+        if (!kategoriLama) return 'Income Lain';
+        const str = kategoriLama.toLowerCase();
+        if (str.includes('gaji')) return 'Gaji';
+        if (str.includes('saku') || str.includes('sangu')) return 'Uang Saku';
+        if (str.includes('aset') || str.includes('invest')) return 'Aset';
+        if (str.includes('side')) return 'Side Income';
+        return 'Income Lain';
+    };
+
+    const normalisasiPengeluaran = (kategoriLama: string) => {
+        if (!kategoriLama) return 'Lain-Lain';
+        const str = kategoriLama.toLowerCase();
+        if (str.includes('hobi')) return 'Hobi';
+        if (str.includes('transport') || str.includes('trasport')) return 'Transport';
+        if (str.includes('jajan') || str.includes('makan')) return 'Jajan';
+        if (str.includes('aset')) return 'Aset';
+        if (str.includes('reparasi')) return 'Reparasi';
+        if (str.includes('mainten')) return 'Maintenance';
+        if (str.includes('rumah')) return 'Rumah';
+        if (str.includes('vape')) return 'Vape';
+        return 'Lain-Lain';
+    };
+
     const fetchRekap = async () => {
         setLoading(true);
         const { data, error } = await supabase
@@ -23,7 +48,36 @@ export default function BulananPage() {
             .eq('bulan_tahun', bulanAktif);
 
         if (!error && data) {
-            setDataRekap(data);
+            // PROSES NORMALISASI & PENGGABUNGAN ULANG DATA (MERGE)
+            const groupedData: any[] = [];
+            
+            data.forEach(item => {
+                const isPemasukan = item.tipe === 'Pemasukan';
+                const kategoriBersih = isPemasukan 
+                    ? normalisasiPemasukan(item.kategori) 
+                    : normalisasiPengeluaran(item.kategori);
+
+                // Cari apakah kategori yang sudah dibersihkan ini sudah masuk ke array baru
+                const existingIndex = groupedData.findIndex(
+                    g => g.tipe === item.tipe && g.kategori === kategoriBersih
+                );
+
+                if (existingIndex >= 0) {
+                    // Jika sudah ada, tambahkan nominalnya (merge)
+                    groupedData[existingIndex].total += item.total;
+                } else {
+                    // Jika belum ada, masukkan sebagai entri baru
+                    groupedData.push({
+                        ...item,
+                        kategori: kategoriBersih
+                    });
+                }
+            });
+
+            // Urutkan dari nominal terbesar ke terkecil agar tabel lebih rapi dibaca
+            groupedData.sort((a, b) => b.total - a.total);
+
+            setDataRekap(groupedData);
         } else if (error) {
             console.error("Error mengambil rangkuman bulanan:", error.message);
         }
@@ -38,8 +92,8 @@ export default function BulananPage() {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
     };
 
-    const pemasukan = dataRekap.filter(d => d.tipe === 'Pemasukan');
-    const pengeluaran = dataRekap.filter(d => d.tipe === 'Pengeluaran');
+    const pemasukan = dataRekap.filter(d => d.tipe === 'Pemasukan' && d.total > 0);
+    const pengeluaran = dataRekap.filter(d => d.tipe === 'Pengeluaran' && d.total > 0);
 
     const totalMasuk = pemasukan.reduce((acc, curr) => acc + curr.total, 0);
     const totalKeluar = pengeluaran.reduce((acc, curr) => acc + curr.total, 0);

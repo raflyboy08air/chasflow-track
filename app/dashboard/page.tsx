@@ -39,6 +39,31 @@ export default function DashboardPage() {
         { id: 'gradBlue', start: '#93c5fd', mid: '#3b82f6', end: '#1d4ed8' },
     ];
 
+    // FUNGSI NORMALISASI KATEGORI (Merapikan data lama yang kotor otomatis)
+    const normalisasiPemasukan = (kategoriLama: string) => {
+        if (!kategoriLama) return 'Income Lain';
+        const str = kategoriLama.toLowerCase();
+        if (str.includes('gaji')) return 'Gaji';
+        if (str.includes('saku') || str.includes('sangu')) return 'Uang Saku';
+        if (str.includes('aset') || str.includes('invest')) return 'Aset';
+        if (str.includes('side')) return 'Side Income';
+        return 'Income Lain';
+    };
+
+    const normalisasiPengeluaran = (kategoriLama: string) => {
+        if (!kategoriLama) return 'Lain-Lain';
+        const str = kategoriLama.toLowerCase();
+        if (str.includes('hobi')) return 'Hobi';
+        if (str.includes('transport') || str.includes('trasport')) return 'Transport';
+        if (str.includes('jajan') || str.includes('makan')) return 'Jajan';
+        if (str.includes('aset')) return 'Aset';
+        if (str.includes('reparasi')) return 'Reparasi';
+        if (str.includes('mainten')) return 'Maintenance';
+        if (str.includes('rumah')) return 'Rumah';
+        if (str.includes('vape')) return 'Vape';
+        return 'Lain-Lain';
+    };
+
     const fetchDashboardData = async () => {
         setIsLoading(true);
 
@@ -59,7 +84,10 @@ export default function DashboardPage() {
                 sumMasuk += item.jumlah;
                 const bulanIndex = parseInt(item.tanggal.split('-')[1]) - 1;
                 rekapBulanan[bulanIndex].Pemasukan += item.jumlah;
-                rekapKategoriMasuk[item.kategori] = (rekapKategoriMasuk[item.kategori] || 0) + item.jumlah;
+                
+                // Gunakan nama kategori yang sudah dirapikan
+                const kategoriBersih = normalisasiPemasukan(item.kategori);
+                rekapKategoriMasuk[kategoriBersih] = (rekapKategoriMasuk[kategoriBersih] || 0) + item.jumlah;
             });
         }
 
@@ -68,7 +96,10 @@ export default function DashboardPage() {
                 sumKeluar += item.jumlah;
                 const bulanIndex = parseInt(item.tanggal.split('-')[1]) - 1;
                 rekapBulanan[bulanIndex].Pengeluaran += item.jumlah;
-                rekapKategoriKeluar[item.kategori] = (rekapKategoriKeluar[item.kategori] || 0) + item.jumlah;
+                
+                // Gunakan nama kategori yang sudah dirapikan
+                const kategoriBersih = normalisasiPengeluaran(item.kategori);
+                rekapKategoriKeluar[kategoriBersih] = (rekapKategoriKeluar[kategoriBersih] || 0) + item.jumlah;
             });
         }
 
@@ -76,8 +107,17 @@ export default function DashboardPage() {
         setTotalPengeluaran(sumKeluar);
         setDataGaris(rekapBulanan);
 
-        setDataDonatPemasukan(Object.keys(rekapKategoriMasuk).map(key => ({ name: key, value: rekapKategoriMasuk[key] })));
-        setDataDonatPengeluaran(Object.keys(rekapKategoriKeluar).map(key => ({ name: key, value: rekapKategoriKeluar[key] })));
+        // Map ke array dan filter yang valuenya 0 agar grafik bersih
+        setDataDonatPemasukan(
+            Object.keys(rekapKategoriMasuk)
+                .map(key => ({ name: key, value: rekapKategoriMasuk[key] }))
+                .filter(item => item.value > 0)
+        );
+        setDataDonatPengeluaran(
+            Object.keys(rekapKategoriKeluar)
+                .map(key => ({ name: key, value: rekapKategoriKeluar[key] }))
+                .filter(item => item.value > 0)
+        );
 
         const { data: lastMasuk } = await supabase.from('pemasukan').select('*').order('tanggal', { ascending: false }).limit(3);
         setRecentPemasukan(lastMasuk || []);
@@ -146,7 +186,6 @@ export default function DashboardPage() {
                 
                 <header className="flex flex-col xl:flex-row justify-between items-center bg-[#151521]/70 backdrop-blur-xl p-4 sm:p-5 rounded-[2rem] shadow-xl border border-white/5 gap-5">
                     
-                    {/* Grup Tombol Navigasi dengan Efek Hover Kilap */}
                     <div className="flex gap-3 flex-wrap justify-center">
                         <Link href="/pemasukan" className="relative overflow-hidden group px-6 py-2.5 text-sm font-semibold text-gray-300 bg-[#1c1c2a] border border-white/10 rounded-xl transition-all duration-300 hover:text-amber-400 hover:border-amber-500/50 hover:shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:-translate-y-1">
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
@@ -170,7 +209,6 @@ export default function DashboardPage() {
                         Cashflow <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500">Tracker</span>
                     </h1>
                     
-                    {/* Tombol Logout Mewah */}
                     <button onClick={handleLogout} className="relative overflow-hidden group px-8 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-rose-600 to-red-500 border border-rose-400/50 rounded-xl transition-all duration-300 hover:shadow-[0_0_25px_rgba(225,29,72,0.6)] hover:-translate-y-1 active:scale-95">
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
                         <span className="relative z-10 tracking-wide">Log out</span>
@@ -206,7 +244,6 @@ export default function DashboardPage() {
                                 <h3 className="text-lg font-bold text-white">Analytics</h3>
                                 <p className="text-sm text-gray-400">Tren Cashflow Bulanan</p>
                             </div>
-                            {/* Tombol Filter Tahun */}
                             <select 
                                 value={tahunAktif}
                                 onChange={(e) => setTahunAktif(e.target.value)}
@@ -426,7 +463,6 @@ export default function DashboardPage() {
                             )}
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

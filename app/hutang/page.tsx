@@ -10,7 +10,7 @@ type Hutang = {
     tanggal: string;
     jumlah: number;
     keterangan: string;
-    kategori: 'Masuk' | 'Keluar';
+    kategori: 'Masuk' | 'Keluar'; // Tipe data terkunci mutlak
 };
 
 export default function HutangPage() {
@@ -18,7 +18,7 @@ export default function HutangPage() {
 
     // State Form
     const [tanggal, setTanggal] = useState('');
-    const [kategori, setKategori] = useState<'Masuk' | 'Keluar'>('Masuk');
+    const [kategori, setKategori] = useState<'Masuk' | 'Keluar'>('Masuk'); // Default aman
     const [jumlah, setJumlah] = useState('');
     const [keterangan, setKeterangan] = useState('');
     
@@ -70,7 +70,7 @@ export default function HutangPage() {
             tanggal: tanggal,
             jumlah: Number(jumlah),
             keterangan: keterangan,
-            kategori: kategori,
+            kategori: kategori, // Pasti mengirim antara "Masuk" atau "Keluar"
             sumber_input: 'manual'
         };
 
@@ -235,27 +235,41 @@ export default function HutangPage() {
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase ml-1">Tanggal</label>
-                                    <input type="date" required value={tanggal} onChange={(e) => setTanggal(e.target.value)} className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-white focus:border-cyan-500 [color-scheme:dark]" />
+                                    <input type="date" required value={tanggal} onChange={(e) => setTanggal(e.target.value)} className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 transition-all [color-scheme:dark]" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase ml-1">Tipe</label>
-                                    <select value={kategori} onChange={(e) => setKategori(e.target.value as 'Masuk' | 'Keluar')} className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-white cursor-pointer">
-                                        <option value="Masuk">Masuk (Piutang ke kita)</option>
-                                        <option value="Keluar">Keluar (Kita meminjam)</option>
+                                    <select 
+                                        value={kategori} 
+                                        onChange={(e) => setKategori(e.target.value as 'Masuk' | 'Keluar')} 
+                                        className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 cursor-pointer transition-all appearance-none"
+                                    >
+                                        <option value="Masuk" className="bg-[#151521]">Masuk (Piutang ke kita)</option>
+                                        <option value="Keluar" className="bg-[#151521]">Keluar (Kita meminjam)</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase ml-1">Nominal (Rp)</label>
-                                    <input type="number" required value={jumlah} onChange={(e) => setJumlah(e.target.value)} className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-cyan-400 font-bold" placeholder="0" />
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-3 text-gray-500 font-medium">Rp</span>
+                                        <input 
+                                            type="number" 
+                                            required 
+                                            value={jumlah} 
+                                            onChange={(e) => setJumlah(e.target.value)} 
+                                            className="w-full pl-10 pr-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-cyan-400 font-bold focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-gray-700" 
+                                            placeholder="0" 
+                                        />
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase ml-1">Keterangan</label>
-                                    <textarea required value={keterangan} onChange={(e) => setKeterangan(e.target.value)} rows={2} className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-white text-sm resize-none" placeholder="Detail catatan..."></textarea>
+                                    <textarea required value={keterangan} onChange={(e) => setKeterangan(e.target.value)} rows={2} className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-white text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 resize-none transition-all placeholder-gray-600" placeholder="Detail catatan..."></textarea>
                                 </div>
-                                <button type="submit" disabled={isSaving} className={`w-full py-4 rounded-xl font-bold shadow-lg transition-all ${isSaving ? 'bg-gray-700' : isEditing ? 'bg-amber-500 text-gray-900' : 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white hover:-translate-y-1'}`}>
+                                <button type="submit" disabled={isSaving} className={`w-full py-4 rounded-xl font-bold shadow-lg transition-all duration-300 hover:-translate-y-1 ${isSaving ? 'bg-gray-700' : isEditing ? 'bg-amber-500 text-gray-900' : 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white'}`}>
                                     {isSaving ? 'Menyimpan...' : isEditing ? 'Update Perubahan' : '+ Catat Hutang'}
                                 </button>
-                                {isEditing && <button onClick={resetForm} type="button" className="w-full text-xs text-gray-500 hover:text-white">Batal Edit</button>}
+                                {isEditing && <button onClick={resetForm} type="button" className="w-full text-xs text-gray-500 hover:text-white mt-2">Batal Edit</button>}
                             </form>
                         </div>
 

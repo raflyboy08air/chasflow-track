@@ -18,7 +18,7 @@ export default function PemasukanPage() {
 
     // State Form
     const [tanggal, setTanggal] = useState('');
-    const [kategori, setKategori] = useState('Gaji');
+    const [kategori, setKategori] = useState('Gaji'); // Default aman
     const [jumlah, setJumlah] = useState('');
     const [keterangan, setKeterangan] = useState('');
     
@@ -29,7 +29,7 @@ export default function PemasukanPage() {
     // State Filter Data
     const currentDate = new Date();
     const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const currentYear = String(currentDate.getFullYear()); // 2026
+    const currentYear = String(currentDate.getFullYear()); 
     
     const [filterBulan, setFilterBulan] = useState(currentMonth);
     const [filterTahun, setFilterTahun] = useState(currentYear);
@@ -53,16 +53,12 @@ export default function PemasukanPage() {
     const fetchPemasukan = async () => {
         setIsLoading(true);
         
-        // --- PERBAIKAN BUG TANGGAL ---
-        // Cari tahu jumlah hari maksimal di bulan dan tahun yang sedang dipilih
         const tahunNum = parseInt(filterTahun);
         const bulanNum = parseInt(filterBulan);
-        // Date(tahun, bulan, 0) otomatis mengembalikan hari terakhir dari bulan tersebut
         const hariTerakhir = new Date(tahunNum, bulanNum, 0).getDate(); 
 
         const startDate = `${filterTahun}-${filterBulan}-01`;
         const endDate = `${filterTahun}-${filterBulan}-${hariTerakhir}`;
-        // ------------------------------
 
         const { data, error } = await supabase
             .from('pemasukan')
@@ -78,7 +74,7 @@ export default function PemasukanPage() {
         }
         setIsLoading(false);
     };
-    // Ambil ulang data setiap kali filter bulan/tahun berubah
+
     useEffect(() => {
         fetchPemasukan();
     }, [filterBulan, filterTahun]);
@@ -92,12 +88,11 @@ export default function PemasukanPage() {
             tanggal: tanggal,
             jumlah: Number(jumlah),
             keterangan: keterangan,
-            kategori: kategori,
+            kategori: kategori, // Pasti akan mengirim salah satu dari 5 pilihan paten
             sumber_input: 'manual'
         };
 
         if (isEditing && editId) {
-            // MODE EDIT: Update ke database
             const { error } = await supabase
                 .from('pemasukan')
                 .update(payload)
@@ -106,11 +101,10 @@ export default function PemasukanPage() {
             if (error) {
                 alert("Gagal mengupdate data: " + error.message);
             } else {
-                fetchPemasukan(); // Refresh tabel
+                fetchPemasukan(); 
                 resetForm();
             }
         } else {
-            // MODE TAMBAH BARU: Insert ke database
             const { error } = await supabase
                 .from('pemasukan')
                 .insert([payload]);
@@ -118,14 +112,14 @@ export default function PemasukanPage() {
             if (error) {
                 alert("Gagal menyimpan data: " + error.message);
             } else {
-                fetchPemasukan(); // Refresh tabel agar urutan terupdate
+                fetchPemasukan(); 
                 resetForm();
             }
         }
         setIsSaving(false);
     };
 
-    // FUNGSI EDIT (Memasukkan data ke form)
+    // FUNGSI EDIT
     const handleEditClick = (item: Pemasukan) => {
         setTanggal(item.tanggal);
         setJumlah(item.jumlah.toString());
@@ -133,7 +127,6 @@ export default function PemasukanPage() {
         setKategori(item.kategori);
         setEditId(item.id);
         setIsEditing(true);
-        // Gulir ke atas secara halus agar user melihat form
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -150,7 +143,6 @@ export default function PemasukanPage() {
             if (error) {
                 alert("Gagal menghapus data: " + error.message);
             } else {
-                // Hapus data dari tampilan tanpa reload
                 setDataPemasukan(dataPemasukan.filter(item => item.id !== id));
             }
         }
@@ -161,7 +153,7 @@ export default function PemasukanPage() {
         setTanggal('');
         setJumlah('');
         setKeterangan('');
-        setKategori('Gaji');
+        setKategori('Gaji'); // Kembalikan ke default aman
         setIsEditing(false);
         setEditId(null);
     };
@@ -177,7 +169,6 @@ export default function PemasukanPage() {
     return (
         <div className="relative min-h-screen bg-[#0B0B0F] text-white p-4 sm:p-6 font-sans overflow-x-hidden">
             
-            {/* Background Glow Effects (Fintech Theme) */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-[-10%] left-[-5%] w-[400px] h-[400px] bg-teal-500/10 rounded-full blur-[100px]"></div>
                 <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]"></div>
@@ -185,10 +176,8 @@ export default function PemasukanPage() {
 
             <div className="relative z-10 max-w-7xl mx-auto space-y-6">
                 
-                {/* HEADER BERPUSAT DENGAN TOMBOL KEMBALI */}
                 <header className="relative flex items-center justify-between bg-[#151521]/70 backdrop-blur-xl p-4 sm:p-5 rounded-[2rem] shadow-xl border border-white/5">
                     
-                    {/* Tombol Kembali (Kiri) */}
                     <button 
                         onClick={() => router.push('/dashboard')}
                         className="relative overflow-hidden group px-6 py-2.5 text-sm font-semibold text-gray-300 bg-[#1c1c2a] border border-white/10 rounded-xl transition-all duration-300 hover:text-white hover:border-white/30 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:-translate-y-1 z-20"
@@ -199,30 +188,25 @@ export default function PemasukanPage() {
                         </span>
                     </button>
                     
-                    {/* Judul (Tengah Mutlak / Absolute Center) */}
                     <div className="absolute left-0 w-full text-center pointer-events-none">
                         <h1 className="text-2xl font-extrabold tracking-tight">
                             Manajemen <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">Pemasukan</span>
                         </h1>
                     </div>
 
-                    {/* Spacer Kanan (Agar flex balance) */}
                     <div className="w-[110px] invisible hidden sm:block"></div>
                 </header>
 
                 <div className="flex flex-col lg:flex-row gap-6">
                     
-                    {/* BAGIAN KIRI: Tabel Data dengan Filter */}
                     <div className="flex-1 bg-[#151521]/70 backdrop-blur-xl rounded-[2rem] border border-white/5 shadow-xl flex flex-col min-h-[500px]">
                         
-                        {/* Header Tabel & Filter */}
                         <div className="p-6 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
                             <div>
                                 <h3 className="text-lg font-bold text-white">Riwayat Pemasukan</h3>
                                 <p className="text-sm text-gray-400">Data masuk berdasarkan bulan</p>
                             </div>
 
-                            {/* Menu Filter */}
                             <div className="flex gap-3">
                                 <select 
                                     value={filterBulan}
@@ -246,7 +230,6 @@ export default function PemasukanPage() {
                             </div>
                         </div>
 
-                        {/* Area Tabel */}
                         <div className="overflow-x-auto flex-1 p-2">
                             <table className="w-full text-left border-collapse">
                                 <thead>
@@ -308,7 +291,6 @@ export default function PemasukanPage() {
                         </div>
                     </div>
 
-                    {/* BAGIAN KANAN: Form Input Kaca (Glassmorphism) */}
                     <div className="w-full lg:w-[350px] bg-[#151521]/70 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border border-white/5 shadow-xl h-fit sticky top-6">
                         
                         <div className="mb-6 border-b border-white/5 pb-4 flex justify-between items-end">
@@ -345,10 +327,10 @@ export default function PemasukanPage() {
                                     className="w-full px-4 py-3 bg-[#0B0B0F]/50 border border-white/5 rounded-xl text-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/50 cursor-pointer transition-all appearance-none"
                                 >
                                     <option value="Gaji" className="bg-[#151521]">Gaji</option>
-                                    <option value="Side income" className="bg-[#151521]">Side income</option>
-                                    <option value="Aset" className="bg-[#151521]">Aset (Trading/Investasi)</option>
-                                    <option value="Sangu" className="bg-[#151521]">Sangu / Bonus</option>
-                                    <option value="income lain" className="bg-[#151521]">Income lain</option>
+                                    <option value="Uang Saku" className="bg-[#151521]">Uang Saku</option>
+                                    <option value="Aset" className="bg-[#151521]">Aset</option>
+                                    <option value="Income Lain" className="bg-[#151521]">Income Lain</option>
+                                    <option value="Side Income" className="bg-[#151521]">Side Income</option>
                                 </select>
                             </div>
 
@@ -379,7 +361,6 @@ export default function PemasukanPage() {
                                 ></textarea>
                             </div>
 
-                            {/* Tombol Simpan Dinamis (Berubah warna jika mode Edit) */}
                             <button 
                                 type="submit"
                                 disabled={isSaving}
